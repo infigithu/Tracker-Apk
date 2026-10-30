@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "Protein Tracker",
+    "slug": "protein-tracker",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.proteintracker.app",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#F7F8F4"
+      }
+    },
+    "plugins": [
+      [
+        "expo-sqlite",
+        {
+          "enableFTS": false
+        }
+      ],
+      "expo-font",
+      "expo-status-bar"
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}

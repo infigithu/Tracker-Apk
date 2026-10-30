@@ -1,0 +1,9 @@
+node_modules/
+.expo/
+dist/
+web-build/
+*.jks
+*.keystore
+npm-debug.log*
+.DS_Store
+*.local

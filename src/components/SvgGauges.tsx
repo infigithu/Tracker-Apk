@@ -26,14 +26,14 @@ export const CalorieRadialGauge: React.FC<CalorieRadialGaugeProps> = ({
 
   // Geometry for arc
   const cx = size / 2;
-  const cy = size * 0.58;
+  const cy = size * 0.50;
   const rInner = size * 0.35;
-  const rOuter = size * 0.44;
+  const rOuter = size * 0.43;
   const totalTicks = 26;
 
-  // Arc angles from 145deg (bottom-left) to 395deg (bottom-right)
-  const startAngleDeg = 145;
-  const endAngleDeg = 395;
+  // Arc angles from 140deg (bottom-left) to 400deg (bottom-right)
+  const startAngleDeg = 140;
+  const endAngleDeg = 400;
   const angleRange = endAngleDeg - startAngleDeg;
 
   const ticks = [];
@@ -52,7 +52,7 @@ export const CalorieRadialGauge: React.FC<CalorieRadialGaugeProps> = ({
     const isActive = i < activeTicksCount;
     // Active ticks use vibrant purple/violet gradient matching Page 1
     const strokeColor = isActive ? '#7C3AED' : '#E4E7F2';
-    const strokeWidth = isActive ? 6 : 5;
+    const strokeWidth = isActive ? Math.max(4.5, size * 0.024) : Math.max(3.5, size * 0.02);
 
     ticks.push(
       <Line
@@ -68,7 +68,8 @@ export const CalorieRadialGauge: React.FC<CalorieRadialGaugeProps> = ({
     );
   }
 
-  const height = size * 0.76;
+  // Calculated height that completely contains the arc and center content
+  const height = Math.round(size * 0.79);
 
   return (
     <View style={[styles.gaugeContainer, { width: size, height }]}>
@@ -76,20 +77,32 @@ export const CalorieRadialGauge: React.FC<CalorieRadialGaugeProps> = ({
         {ticks}
       </Svg>
 
-      <View style={[styles.gaugeCenter, { top: cy - 48 }]}>
+      <View style={[styles.gaugeCenter, { top: Math.round(cy - size * 0.23) }]}>
         <View style={styles.flameCircle}>
           <Ionicons
             name={mode === 'calories' ? 'flame' : 'barbell'}
-            size={18}
+            size={Math.max(15, Math.round(size * 0.075))}
             color="#FF6B00"
           />
         </View>
 
-        <Text style={styles.gaugeNumber}>{Math.round(consumed)}</Text>
+        <Text
+          style={[styles.gaugeNumber, { fontSize: Math.max(28, Math.round(size * 0.155)) }]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.8}
+        >
+          {Math.round(consumed)}
+        </Text>
         <Text style={styles.gaugeUnit}>{mode === 'calories' ? 'kcal' : 'g protein'}</Text>
 
         <View style={styles.remainingPill}>
-          <Text style={styles.remainingPillText}>
+          <Text
+            style={styles.remainingPillText}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.8}
+          >
             {consumed >= safeTarget ? 'Target reached! 🎉' : `${Math.round(remaining)} ${mode === 'calories' ? 'kcal' : 'g'} left`}
           </Text>
         </View>
@@ -293,32 +306,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   flameCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     backgroundColor: '#FFF4EB',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   gaugeNumber: {
-    fontSize: 40,
     fontWeight: '800',
     color: Colors.ink,
     letterSpacing: -1,
   },
   gaugeUnit: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
     color: Colors.muted,
-    marginTop: -2,
+    marginTop: -1,
   },
   remainingPill: {
     backgroundColor: '#F3F4F6',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginTop: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 10,
+    marginTop: 4,
   },
   remainingPillText: {
     fontSize: 11,

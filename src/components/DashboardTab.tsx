@@ -66,7 +66,8 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
 }) => {
   const insets = useSafeAreaInsets();
   const { width: windowWidth } = useWindowDimensions();
-  const gaugeSize = Math.min(270, Math.max(210, windowWidth - 72));
+  // Calorie gauge sized responsively so it doesn't crowd vertical or horizontal space
+  const gaugeSize = Math.min(235, Math.max(185, Math.round(windowWidth - 110)));
 
   const isToday = date === todayKey();
   const [activeSlotForAdd, setActiveSlotForAdd] = useState<MealType | null>(null);
@@ -156,11 +157,15 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
     >
       {/* Top Bar matching Page 1 */}
       <View style={styles.topBar}>
-        <Pressable style={styles.userProfileBtn} onPress={onOpenProfile}>
+        <Pressable
+          style={styles.userProfileBtn}
+          onPress={onOpenProfile}
+          accessibilityLabel="Open user profile and goals"
+        >
           <View style={styles.avatarCircle}>
-            <Ionicons name="person" size={18} color="#FFFFFF" />
+            <Ionicons name="person" size={17} color="#FFFFFF" />
           </View>
-          <View style={{ flex: 1, minWidth: 0 }}>
+          <View style={styles.profileTextWrap}>
             <Text style={styles.helloText} numberOfLines={1} ellipsizeMode="tail">
               Hello, {targets.userName || 'Champion'}
             </Text>
@@ -175,24 +180,33 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
             style={styles.celebrationTestBtn}
             onPress={onTriggerCelebrationTest}
             hitSlop={8}
+            accessibilityLabel="Test celebration animation"
           >
-            <Ionicons name="sparkles" size={16} color="#F59E0B" />
+            <Ionicons name="sparkles" size={15} color="#F59E0B" />
           </Pressable>
 
           <Pressable
             style={styles.calendarPill}
-            onPress={() => isToday ? null : onSetDate(todayKey())}
+            onPress={() => (isToday ? null : onSetDate(todayKey()))}
+            accessibilityLabel="Current date status"
           >
-            <Ionicons name="calendar-outline" size={14} color={Colors.primary} />
-            <Text style={styles.calendarPillText}>{dateFormatted}</Text>
+            <Ionicons name="calendar-outline" size={13} color={Colors.primary} />
+            <Text style={styles.calendarPillText} numberOfLines={1} ellipsizeMode="tail">
+              {dateFormatted}
+            </Text>
           </Pressable>
         </View>
       </View>
 
       {/* Date Navigator Bar */}
       <View style={styles.dateNavigator}>
-        <Pressable style={styles.dateNavBtn} onPress={() => onChangeDate(-1)}>
-          <Ionicons name="chevron-back" size={20} color={Colors.ink} />
+        <Pressable
+          style={styles.dateNavBtn}
+          onPress={() => onChangeDate(-1)}
+          hitSlop={6}
+          accessibilityLabel="Previous day"
+        >
+          <Ionicons name="chevron-back" size={18} color={Colors.ink} />
         </Pressable>
 
         <Text style={styles.dateNavText} numberOfLines={1} ellipsizeMode="tail">
@@ -207,16 +221,29 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
           style={[styles.dateNavBtn, isToday && { opacity: 0.3 }]}
           onPress={() => onChangeDate(1)}
           disabled={isToday}
+          hitSlop={6}
+          accessibilityLabel="Next day"
         >
-          <Ionicons name="chevron-forward" size={20} color={Colors.ink} />
+          <Ionicons name="chevron-forward" size={18} color={Colors.ink} />
         </Pressable>
       </View>
 
       {/* Main Energy / Calorie Gauge Card (Page 1 reference) */}
       <View style={styles.gaugeCard}>
         <View style={styles.gaugeHeader}>
-          <Text style={styles.gaugeTitle}>Calorie & Protein Summary</Text>
-          <Text style={styles.gaugeSub}>Goal: {targets.calorieTarget} kcal</Text>
+          <View style={styles.gaugeHeaderLeft}>
+            <Text style={styles.gaugeTitle} numberOfLines={1}>Calorie & Protein Summary</Text>
+            <Text style={styles.gaugeSub} numberOfLines={1}>Goal: {targets.calorieTarget} kcal</Text>
+          </View>
+
+          <Pressable
+            style={styles.gaugeSettingsBtn}
+            onPress={onOpenProfile}
+            hitSlop={8}
+            accessibilityLabel="Adjust calorie and macro goals"
+          >
+            <Ionicons name="settings-outline" size={17} color={Colors.primaryDark} />
+          </Pressable>
         </View>
 
         <CalorieRadialGauge
@@ -510,32 +537,41 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 18,
+    paddingHorizontal: 16,
     paddingBottom: 90,
-    gap: 14,
+    gap: 12,
   },
   topBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 8,
+    width: '100%',
+    paddingTop: 6,
     paddingBottom: 4,
   },
   userProfileBtn: {
+    flex: 1,
+    minWidth: 0,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
+    marginRight: 8,
   },
   avatarCircle: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
+  },
+  profileTextWrap: {
+    flex: 1,
+    minWidth: 0,
   },
   helloText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '800',
     color: Colors.ink,
   },
@@ -547,7 +583,8 @@ const styles = StyleSheet.create({
   topActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
+    flexShrink: 0,
   },
   celebrationTestBtn: {
     width: 32,
@@ -556,6 +593,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEF3C7',
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
   },
   calendarPill: {
     flexDirection: 'row',
@@ -564,9 +602,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#E6EAE4',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 20,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 16,
+    maxWidth: 115,
+    flexShrink: 0,
   },
   calendarPillText: {
     fontSize: 11,
@@ -579,23 +619,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
     borderWidth: 1,
     borderColor: '#EEF2EC',
+    width: '100%',
   },
   dateNavBtn: {
-    width: 32,
-    height: 32,
+    width: 30,
+    height: 30,
     borderRadius: 10,
     backgroundColor: '#F8FAF8',
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
   },
   dateNavText: {
+    flex: 1,
     fontSize: 13,
     fontWeight: '700',
     color: Colors.ink,
+    textAlign: 'center',
+    marginHorizontal: 6,
   },
   gaugeCard: {
     backgroundColor: '#FFFFFF',
@@ -605,13 +650,19 @@ const styles = StyleSheet.create({
     borderColor: '#EEF2EC',
     ...Shadows.soft,
     alignItems: 'center',
+    width: '100%',
   },
   gaugeHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-    marginBottom: 4,
+    marginBottom: 6,
+  },
+  gaugeHeaderLeft: {
+    flex: 1,
+    minWidth: 0,
+    marginRight: 8,
   },
   gaugeTitle: {
     fontSize: 14,
@@ -623,11 +674,22 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.muted,
   },
+  gaugeSettingsBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F3F6F2',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#E6EAE4',
+    flexShrink: 0,
+  },
   macrosRow: {
     flexDirection: 'row',
     gap: 8,
     width: '100%',
-    marginTop: 12,
+    marginTop: 14,
   },
   waterGlance: {
     backgroundColor: '#FFFFFF',

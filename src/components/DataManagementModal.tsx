@@ -12,6 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import {
   exportAllData,
@@ -36,6 +37,7 @@ export const DataManagementModal: React.FC<DataManagementModalProps> = ({
   onClose,
   onReload,
 }) => {
+  const insets = useSafeAreaInsets();
   const [importJson, setImportJson] = useState('');
   const [showImportBox, setShowImportBox] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -162,9 +164,9 @@ export const DataManagementModal: React.FC<DataManagementModalProps> = ({
         >
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
-              <View>
-                <Text style={styles.modalTitle}>Data & Privacy</Text>
-                <Text style={styles.modalSub}>100% offline, local SQLite storage</Text>
+              <View style={{ flex: 1, minWidth: 0, marginRight: 8 }}>
+                <Text style={styles.modalTitle} numberOfLines={1}>Data & Privacy</Text>
+                <Text style={styles.modalSub} numberOfLines={1}>100% offline, local SQLite storage</Text>
               </View>
               <Pressable onPress={onClose} hitSlop={12} style={styles.closeBtn}>
                 <Ionicons name="close" size={24} color={Colors.ink} />
@@ -172,7 +174,7 @@ export const DataManagementModal: React.FC<DataManagementModalProps> = ({
             </View>
 
             <ScrollView
-              contentContainerStyle={styles.scrollContent}
+              contentContainerStyle={[styles.scrollContent, { paddingBottom: 40 + insets.bottom }]}
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
             >

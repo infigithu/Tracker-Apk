@@ -12,6 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Food, MealType } from '../types';
 import { Colors, Shadows } from '../theme';
@@ -48,6 +49,7 @@ export const FoodLibraryTab: React.FC<FoodLibraryTabProps> = ({
   onDeleteFood,
   onQuickLog,
 }) => {
+  const insets = useSafeAreaInsets();
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
 
@@ -167,9 +169,9 @@ export const FoodLibraryTab: React.FC<FoodLibraryTabProps> = ({
     <View style={styles.container}>
       {/* Header matching Page 2 */}
       <View style={styles.header}>
-        <View>
+        <View style={{ flex: 1, minWidth: 0, marginRight: 10 }}>
           <Text style={styles.title}>Food Library</Text>
-          <Text style={styles.subtitle}>
+          <Text style={styles.subtitle} numberOfLines={1}>
             {foods.length} items · Indian staples & fitness foods
           </Text>
         </View>
@@ -230,7 +232,10 @@ export const FoodLibraryTab: React.FC<FoodLibraryTabProps> = ({
       <FlatList
         data={filteredFoods}
         keyExtractor={item => String(item.id)}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[
+          styles.listContent,
+          { paddingBottom: 95 + Math.max(insets.bottom, 10) },
+        ]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         ListEmptyComponent={
@@ -245,15 +250,15 @@ export const FoodLibraryTab: React.FC<FoodLibraryTabProps> = ({
         renderItem={({ item: f }) => (
           <View style={styles.foodCard}>
             <View style={styles.cardTop}>
-              <View style={styles.foodInfo}>
+              <View style={[styles.foodInfo, { flex: 1, minWidth: 0, marginRight: 8 }]}>
                 <View style={styles.categoryBadge}>
                   <Text style={styles.categoryBadgeText}>{f.category || 'Food'}</Text>
                 </View>
-                <Text style={styles.foodName}>{f.name}</Text>
-                <Text style={styles.servingText}>Serving: {f.serving}</Text>
+                <Text style={styles.foodName} numberOfLines={1}>{f.name}</Text>
+                <Text style={styles.servingText} numberOfLines={1}>Serving: {f.serving}</Text>
               </View>
 
-              <View style={styles.cardActions}>
+              <View style={[styles.cardActions, { flexShrink: 0 }]}>
                 <Pressable
                   style={styles.iconBtn}
                   onPress={() => openEditModal(f)}
@@ -273,7 +278,7 @@ export const FoodLibraryTab: React.FC<FoodLibraryTabProps> = ({
 
             {/* Nutrition Badges */}
             <View style={styles.cardBottom}>
-              <View style={styles.macroPills}>
+              <View style={[styles.macroPills, { marginRight: 8 }]}>
                 <View style={[styles.macroBadge, { backgroundColor: '#E8F7EE' }]}>
                   <Text style={[styles.macroBadgeText, { color: Colors.primaryDark }]}>
                     {Math.round(f.protein * 10) / 10}g Protein
@@ -304,7 +309,7 @@ export const FoodLibraryTab: React.FC<FoodLibraryTabProps> = ({
               </View>
 
               <Pressable
-                style={styles.quickLogBtn}
+                style={[styles.quickLogBtn, { flexShrink: 0 }]}
                 onPress={() => openLogDialog(f)}
               >
                 <Ionicons name="add" size={16} color="#FFFFFF" />
@@ -330,7 +335,10 @@ export const FoodLibraryTab: React.FC<FoodLibraryTabProps> = ({
                 </Pressable>
               </View>
 
-              <ScrollView contentContainerStyle={styles.formScroll} keyboardShouldPersistTaps="handled">
+              <ScrollView
+                contentContainerStyle={[styles.formScroll, { paddingBottom: 35 + insets.bottom }]}
+                keyboardShouldPersistTaps="handled"
+              >
                 <Text style={styles.inputLabel}>Food Name</Text>
                 <TextInput
                   value={draftName}
@@ -535,7 +543,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 18,
-    paddingBottom: 78,
   },
   header: {
     flexDirection: 'row',

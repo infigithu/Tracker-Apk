@@ -6,6 +6,7 @@ import {
   ScrollView,
   Pressable,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { DayHistory } from '../types';
 import { Colors, Shadows } from '../theme';
@@ -27,6 +28,8 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   waterTarget,
   onSelectDate,
 }) => {
+  const insets = useSafeAreaInsets();
+
   // Weekly averages
   const weeklyAverages = useMemo(() => {
     if (!weekly.length) return { protein: 0, calories: 0, water: 0, count: 0 };
@@ -47,11 +50,17 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
   const maxWeeklyProtein = Math.max(proteinTarget * 1.1, ...weekly.map(w => w.protein));
 
   return (
-    <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        { paddingBottom: 95 + Math.max(insets.bottom, 10) },
+      ]}
+      showsVerticalScrollIndicator={false}
+    >
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.brandSubtitle}>ANALYTICS & ARCHIVE</Text>
-        <Text style={styles.title}>Progress History</Text>
+        <Text style={styles.title} numberOfLines={1}>Progress History</Text>
       </View>
 
       {/* This Week Average Cards (Inspired by Page 4 of PDF) */}
@@ -65,7 +74,9 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
               <Ionicons name="barbell" size={18} color={Colors.primary} />
             </View>
             <Text style={styles.kpiLabel}>Avg Protein</Text>
-            <Text style={styles.kpiValue}>{weeklyAverages.protein} g</Text>
+            <Text style={styles.kpiValue} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
+              {weeklyAverages.protein} g
+            </Text>
             <Text style={styles.kpiTarget}>Goal: {proteinTarget} g</Text>
           </View>
 
@@ -75,7 +86,9 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
               <Ionicons name="flame" size={18} color="#FF6E2E" />
             </View>
             <Text style={styles.kpiLabel}>Avg Calories</Text>
-            <Text style={styles.kpiValue}>{weeklyAverages.calories}</Text>
+            <Text style={styles.kpiValue} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
+              {weeklyAverages.calories}
+            </Text>
             <Text style={styles.kpiTarget}>Goal: {calorieTarget} kcal</Text>
           </View>
 
@@ -85,7 +98,9 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
               <Ionicons name="water" size={18} color="#0284C7" />
             </View>
             <Text style={styles.kpiLabel}>Avg Water</Text>
-            <Text style={styles.kpiValue}>{weeklyAverages.water} ml</Text>
+            <Text style={styles.kpiValue} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
+              {weeklyAverages.water} ml
+            </Text>
             <Text style={styles.kpiTarget}>Goal: {waterTarget} ml</Text>
           </View>
 
@@ -95,7 +110,9 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
               <Ionicons name="calendar" size={18} color="#D97706" />
             </View>
             <Text style={styles.kpiLabel}>Active Days</Text>
-            <Text style={styles.kpiValue}>{weeklyAverages.count} / 7</Text>
+            <Text style={styles.kpiValue} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
+              {weeklyAverages.count} / 7
+            </Text>
             <Text style={styles.kpiTarget}>Consistency</Text>
           </View>
         </View>
@@ -164,7 +181,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
                 style={styles.historyRow}
                 onPress={() => onSelectDate(item.date)}
               >
-                <View style={styles.rowLeft}>
+                <View style={[styles.rowLeft, { flex: 1, minWidth: 0, marginRight: 8 }]}>
                   <View
                     style={[
                       styles.dateIconCircle,
@@ -178,21 +195,22 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
                     />
                   </View>
 
-                  <View>
-                    <Text style={styles.rowDateTitle}>{formattedDate}</Text>
-                    <Text style={styles.rowEntriesSub}>
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    <Text style={styles.rowDateTitle} numberOfLines={1}>{formattedDate}</Text>
+                    <Text style={styles.rowEntriesSub} numberOfLines={1}>
                       {item.entries} meals · {item.water} ml water
                     </Text>
                   </View>
                 </View>
 
-                <View style={styles.rowRight}>
+                <View style={[styles.rowRight, { flexShrink: 0 }]}>
                   <View style={styles.metricItem}>
                     <Text
                       style={[
                         styles.metricNumber,
                         proteinGoalMet && { color: Colors.primaryDark },
                       ]}
+                      numberOfLines={1}
                     >
                       {item.protein}g
                     </Text>
@@ -200,7 +218,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({
                   </View>
 
                   <View style={styles.metricItem}>
-                    <Text style={styles.metricNumber}>{Math.round(item.calories)}</Text>
+                    <Text style={styles.metricNumber} numberOfLines={1}>{Math.round(item.calories)}</Text>
                     <Text style={styles.metricSub}>kcal</Text>
                   </View>
 
@@ -253,10 +271,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 10,
-    justifyContent: 'space-between',
   },
   kpiCard: {
-    width: '48%',
+    flexBasis: '47%',
+    flexGrow: 1,
+    minWidth: 140,
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 14,

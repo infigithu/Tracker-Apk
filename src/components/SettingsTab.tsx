@@ -6,6 +6,7 @@ import {
   ScrollView,
   Pressable,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { UserSettings } from '../types';
 import { Colors, Shadows } from '../theme';
@@ -23,12 +24,20 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
   onOpenDataModal,
   onTriggerCelebration,
 }) => {
+  const insets = useSafeAreaInsets();
+
   return (
-    <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      contentContainerStyle={[
+        styles.container,
+        { paddingBottom: 95 + Math.max(insets.bottom, 10) },
+      ]}
+      showsVerticalScrollIndicator={false}
+    >
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.brandSubtitle}>PREFERENCES & PROFILE</Text>
-        <Text style={styles.title}>Settings</Text>
+        <Text style={styles.title} numberOfLines={1}>Settings</Text>
       </View>
 
       {/* Profile Card */}
@@ -37,13 +46,13 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
           <Ionicons name="person" size={28} color="#FFFFFF" />
         </View>
 
-        <View style={styles.profileInfo}>
-          <Text style={styles.profileName}>{settings.userName || 'Fitness Champion'}</Text>
-          <Text style={styles.profileStats}>
+        <View style={[styles.profileInfo, { flex: 1, minWidth: 0 }]}>
+          <Text style={styles.profileName} numberOfLines={1}>{settings.userName || 'Fitness Champion'}</Text>
+          <Text style={styles.profileStats} numberOfLines={1}>
             {settings.userWeightKg} kg · {settings.userHeightCm} cm · {settings.userAge} yrs
           </Text>
           <View style={styles.goalTag}>
-            <Text style={styles.goalTagText}>
+            <Text style={styles.goalTagText} numberOfLines={1}>
               Goal: {settings.goal === 'lose' ? 'Fat Loss' : settings.goal === 'gain' ? 'Muscle Building' : 'Maintain'}
             </Text>
           </View>
@@ -52,13 +61,13 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
 
       {/* Personalized Nutrition Calculator Button */}
       <Pressable style={styles.calculatorCard} onPress={onOpenGoalsModal}>
-        <View style={styles.calculatorLeft}>
+        <View style={[styles.calculatorLeft, { flex: 1, minWidth: 0, marginRight: 8 }]}>
           <View style={styles.calcIcon}>
             <Ionicons name="calculator-outline" size={22} color={Colors.primary} />
           </View>
-          <View>
-            <Text style={styles.calcTitle}>Personalized Goals Calculator</Text>
-            <Text style={styles.calcSub}>
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text style={styles.calcTitle} numberOfLines={1}>Personalized Goals Calculator</Text>
+            <Text style={styles.calcSub} numberOfLines={2}>
               Recalculate BMR, TDEE, & protein based on your metrics
             </Text>
           </View>
@@ -78,7 +87,12 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
         <View style={styles.targetsGrid}>
           <View style={styles.targetCard}>
             <Text style={styles.targetLabel}>Protein Goal</Text>
-            <Text style={[styles.targetValue, { color: Colors.primaryDark }]}>
+            <Text
+              style={[styles.targetValue, { color: Colors.primaryDark }]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+            >
               {settings.proteinTarget} <Text style={styles.targetUnit}>g</Text>
             </Text>
             <Text style={styles.targetSub}>Muscle growth</Text>
@@ -86,7 +100,12 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
 
           <View style={styles.targetCard}>
             <Text style={styles.targetLabel}>Calorie Goal</Text>
-            <Text style={[styles.targetValue, { color: '#C2410C' }]}>
+            <Text
+              style={[styles.targetValue, { color: '#C2410C' }]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+            >
               {settings.calorieTarget} <Text style={styles.targetUnit}>kcal</Text>
             </Text>
             <Text style={styles.targetSub}>Daily energy</Text>
@@ -94,7 +113,12 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
 
           <View style={styles.targetCard}>
             <Text style={styles.targetLabel}>Carbs Goal</Text>
-            <Text style={[styles.targetValue, { color: '#1D4ED8' }]}>
+            <Text
+              style={[styles.targetValue, { color: '#1D4ED8' }]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+            >
               {settings.carbsTarget} <Text style={styles.targetUnit}>g</Text>
             </Text>
             <Text style={styles.targetSub}>Daily stamina</Text>
@@ -102,15 +126,25 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
 
           <View style={styles.targetCard}>
             <Text style={styles.targetLabel}>Fat Goal</Text>
-            <Text style={[styles.targetValue, { color: '#6D28D9' }]}>
+            <Text
+              style={[styles.targetValue, { color: '#6D28D9' }]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+            >
               {settings.fatTarget} <Text style={styles.targetUnit}>g</Text>
             </Text>
             <Text style={styles.targetSub}>Hormone balance</Text>
           </View>
 
-          <View style={[styles.targetCard, { width: '100%' }]}>
+          <View style={[styles.targetCard, { width: '100%', flexBasis: '100%' }]}>
             <Text style={styles.targetLabel}>Water Hydration Goal</Text>
-            <Text style={[styles.targetValue, { color: '#0369A1' }]}>
+            <Text
+              style={[styles.targetValue, { color: '#0369A1' }]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+            >
               {settings.waterTarget} <Text style={styles.targetUnit}>ml / day</Text>
             </Text>
             <Text style={styles.targetSub}>
@@ -291,10 +325,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 10,
-    justifyContent: 'space-between',
   },
   targetCard: {
-    width: '48%',
+    flexBasis: '47%',
+    flexGrow: 1,
+    minWidth: 140,
     backgroundColor: '#FFFFFF',
     borderRadius: 18,
     padding: 14,

@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  SafeAreaView,
   View,
   Text,
   StyleSheet,
   Pressable,
   Alert,
   Platform,
+  StatusBar as RNStatusBar,
 } from 'react-native';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar as ExpoStatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -59,7 +60,14 @@ import { DataManagementModal } from './src/components/DataManagementModal';
 
 type NavTab = 'Today' | 'Food' | 'Meals' | 'Water' | 'History' | 'Settings';
 
-export default function App() {
+function MainApp() {
+  const insets = useSafeAreaInsets();
+  const topInset = Math.max(
+    insets.top,
+    Platform.OS === 'android' ? (RNStatusBar.currentHeight || 24) : 0
+  );
+  const bottomNavOffset = Math.max(10, insets.bottom + (Platform.OS === 'ios' ? 8 : 10));
+
   const [ready, setReady] = useState(false);
   const [activeTab, setActiveTab] = useState<NavTab>('Today');
   const [activeDate, setActiveDate] = useState<string>(todayKey());
@@ -125,6 +133,8 @@ export default function App() {
   }, [activeDate]);
 
   useEffect(() => {
+    RNStatusBar.setBarStyle('dark-content');
+
     initDb()
       .then(async () => {
         await refreshData(activeDate);
@@ -300,23 +310,40 @@ export default function App() {
 
   if (!ready) {
     return (
-      <SafeAreaView style={styles.loadingContainer}>
+      <View
+        style={[
+          styles.loadingContainer,
+          {
+            paddingTop: topInset,
+            paddingBottom: insets.bottom + 20,
+          },
+        ]}
+      >
         <ExpoStatusBar style="dark" />
         <View style={styles.loadingIconWrap}>
           <Ionicons name="barbell" size={40} color={Colors.primary} />
         </View>
         <Text style={styles.loadingTitle}>Protein Tracker</Text>
         <Text style={styles.loadingSub}>Loading local SQLite database & Indian food catalog…</Text>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <ExpoStatusBar style="dark" />
 
-      {/* Main Tab View */}
-      <View style={styles.screenContainer}>
+      {/* Main Tab View with Safe Top and Horizontal Insets */}
+      <View
+        style={[
+          styles.screenContainer,
+          {
+            paddingTop: topInset,
+            paddingLeft: insets.left,
+            paddingRight: insets.right,
+          },
+        ]}
+      >
         {activeTab === 'Today' && (
           <DashboardTab
             date={activeDate}
@@ -404,8 +431,17 @@ export default function App() {
         )}
       </View>
 
-      {/* Floating Pill Bottom Navigation Bar (Matching Page 1, 2, 3) */}
-      <View style={styles.floatingNavWrapper}>
+      {/* Floating Pill Bottom Navigation Bar (Non-overlapping with Android System Nav) */}
+      <View
+        style={[
+          styles.floatingNavWrapper,
+          {
+            bottom: bottomNavOffset,
+            left: Math.max(10, insets.left + 10),
+            right: Math.max(10, insets.right + 10),
+          },
+        ]}
+      >
         <View style={styles.floatingNavBar}>
           {[
             { id: 'Today', icon: 'grid', label: 'Diary' },
@@ -420,15 +456,20 @@ export default function App() {
               <Pressable
                 key={tab.id}
                 onPress={() => setActiveTab(tab.id as NavTab)}
-                style={[styles.navItem, isActive && styles.navItemActive]}
+                style={[
+                  styles.navItem,
+                  isActive ? styles.navItemActive : styles.navItemInactive,
+                ]}
               >
                 <Ionicons
                   name={tab.icon as any}
-                  size={19}
+                  size={18}
                   color={isActive ? '#FFFFFF' : '#8A9990'}
                 />
                 {isActive && (
-                  <Text style={styles.navLabelActive}>{tab.label}</Text>
+                  <Text style={styles.navLabelActive} numberOfLines={1}>
+                    {tab.label}
+                  </Text>
                 )}
               </Pressable>
             );
@@ -460,7 +501,15 @@ export default function App() {
         onClose={() => setDataModalOpen(false)}
         onReload={() => refreshData(activeDate)}
       />
-    </SafeAreaView>
+    </View>
+  );
+}
+
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <MainApp />
+    </SafeAreaProvider>
   );
 }
 
@@ -500,9 +549,6 @@ const styles = StyleSheet.create({
   },
   floatingNavWrapper: {
     position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 16 : 10,
-    left: 14,
-    right: 14,
     alignItems: 'center',
   },
   floatingNavBar: {
@@ -511,8 +557,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: '#131916',
     borderRadius: 36,
-    paddingHorizontal: 8,
-    paddingVertical: 7,
+    paddingHorizontal: 6,
+    paddingVertical: 6,
     width: '100%',
     ...Shadows.floating,
   },
@@ -520,17 +566,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 24,
+    gap: 5,
+    borderRadius: 22,
   },
   navItemActive: {
     backgroundColor: Colors.primary,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+  },
+  navItemInactive: {
+    paddingHorizontal: 7,
+    paddingVertical: 7,
+    minWidth: 36,
   },
   navLabelActive: {
     color: '#FFFFFF',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '800',
   },
 });

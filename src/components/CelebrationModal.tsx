@@ -6,8 +6,9 @@ import {
   StyleSheet,
   Pressable,
   Animated,
-  Dimensions,
+  useWindowDimensions,
   Easing,
+  ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Shadows } from '../theme';
@@ -17,11 +18,12 @@ interface ConfettiPieceProps {
   color: string;
   size: number;
   delay: number;
+  targetY: number;
 }
 
 const CONFETTI_COLORS = ['#1FB267', '#FF6E2E', '#3B82F6', '#F59E0B', '#8B5CF6', '#EC4899', '#10B981'];
 
-const ConfettiParticle: React.FC<ConfettiPieceProps> = ({ startX, color, size, delay }) => {
+const ConfettiParticle: React.FC<ConfettiPieceProps> = ({ startX, color, size, delay, targetY }) => {
   const translateY = useRef(new Animated.Value(-30)).current;
   const rotate = useRef(new Animated.Value(0)).current;
   const opacity = useRef(new Animated.Value(1)).current;
@@ -31,7 +33,7 @@ const ConfettiParticle: React.FC<ConfettiPieceProps> = ({ startX, color, size, d
       Animated.delay(delay),
       Animated.parallel([
         Animated.timing(translateY, {
-          toValue: Dimensions.get('window').height + 40,
+          toValue: targetY,
           duration: 2400 + Math.random() * 1000,
           easing: Easing.bezier(0.25, 0.1, 0.25, 1),
           useNativeDriver: true,
@@ -88,9 +90,9 @@ export const CelebrationModal: React.FC<CelebrationModalProps> = ({
   streak = 1,
   onClose,
 }) => {
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const scaleAnim = useRef(new Animated.Value(0.3)).current;
   const bounceAnim = useRef(new Animated.Value(0)).current;
-  const screenWidth = Dimensions.get('window').width;
 
   useEffect(() => {
     if (visible) {
@@ -145,6 +147,7 @@ export const CelebrationModal: React.FC<CelebrationModalProps> = ({
               color={c.color}
               size={c.size}
               delay={c.delay}
+              targetY={screenHeight + 40}
             />
           ))}
         </View>
@@ -198,12 +201,13 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 28,
-    paddingHorizontal: 24,
-    paddingTop: 32,
-    paddingBottom: 26,
+    paddingHorizontal: 22,
+    paddingTop: 28,
+    paddingBottom: 24,
     alignItems: 'center',
     width: '100%',
     maxWidth: 360,
+    maxHeight: '90%',
     ...Shadows.floating,
   },
   trophyWrapper: {

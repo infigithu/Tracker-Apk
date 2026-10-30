@@ -16,6 +16,15 @@
         "backgroundColor": "#F7F8F4"
       }
     },
+    "androidStatusBar": {
+      "barStyle": "dark-content",
+      "backgroundColor": "#F7F8F4",
+      "translucent": true
+    },
+    "androidNavigationBar": {
+      "barStyle": "dark-content",
+      "backgroundColor": "#131916"
+    },
     "plugins": [
       [
         "expo-sqlite",

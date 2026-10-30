@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { UserSettings } from '../types';
 import { Colors, Shadows } from '../theme';
@@ -28,6 +29,7 @@ export const PersonalizedGoalsModal: React.FC<PersonalizedGoalsModalProps> = ({
   onClose,
   onSave,
 }) => {
+  const insets = useSafeAreaInsets();
   const [gender, setGender] = useState<'male' | 'female' | 'other'>(settings.userGender || 'male');
   const [age, setAge] = useState(String(settings.userAge || 26));
   const [heightCm, setHeightCm] = useState(String(settings.userHeightCm || 175));
@@ -140,9 +142,9 @@ export const PersonalizedGoalsModal: React.FC<PersonalizedGoalsModalProps> = ({
         >
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
-              <View>
-                <Text style={styles.modalTitle}>Personalized Goals</Text>
-                <Text style={styles.modalSub}>Science-backed macro calculation</Text>
+              <View style={{ flex: 1, minWidth: 0, marginRight: 8 }}>
+                <Text style={styles.modalTitle} numberOfLines={1}>Personalized Goals</Text>
+                <Text style={styles.modalSub} numberOfLines={1}>Science-backed macro calculation</Text>
               </View>
               <Pressable onPress={onClose} hitSlop={12} style={styles.closeBtn}>
                 <Ionicons name="close" size={24} color={Colors.ink} />
@@ -150,7 +152,7 @@ export const PersonalizedGoalsModal: React.FC<PersonalizedGoalsModalProps> = ({
             </View>
 
             <ScrollView
-              contentContainerStyle={styles.scrollContent}
+              contentContainerStyle={[styles.scrollContent, { paddingBottom: 40 + insets.bottom }]}
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
             >

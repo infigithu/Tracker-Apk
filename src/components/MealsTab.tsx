@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Food, Meal, MealItem, MealType } from '../types';
 import { Colors, Shadows } from '../theme';
@@ -30,6 +31,7 @@ export const MealsTab: React.FC<MealsTabProps> = ({
   onDeleteMeal,
   onLogMeal,
 }) => {
+  const insets = useSafeAreaInsets();
   const [modalVisible, setModalVisible] = useState(false);
   const [draftId, setDraftId] = useState<number | undefined>(undefined);
   const [draftName, setDraftName] = useState('');
@@ -135,9 +137,9 @@ export const MealsTab: React.FC<MealsTabProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View>
+        <View style={{ flex: 1, minWidth: 0, marginRight: 10 }}>
           <Text style={styles.title}>Saved Meals</Text>
-          <Text style={styles.subtitle}>
+          <Text style={styles.subtitle} numberOfLines={1}>
             {meals.length} multi-item combo templates
           </Text>
         </View>
@@ -148,7 +150,13 @@ export const MealsTab: React.FC<MealsTabProps> = ({
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollList} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollList,
+          { paddingBottom: 95 + Math.max(insets.bottom, 10) },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {meals.length === 0 ? (
           <View style={styles.emptyCard}>
             <Ionicons name="fast-food-outline" size={44} color="#A2B0A6" />
@@ -168,19 +176,19 @@ export const MealsTab: React.FC<MealsTabProps> = ({
             return (
               <View key={m.id} style={styles.mealCard}>
                 <View style={styles.cardHeader}>
-                  <View style={styles.cardHeaderLeft}>
+                  <View style={[styles.cardHeaderLeft, { flex: 1, minWidth: 0, marginRight: 8 }]}>
                     <View style={styles.comboIcon}>
                       <Ionicons name="fast-food" size={18} color={Colors.primary} />
                     </View>
-                    <View>
-                      <Text style={styles.mealName}>{m.name}</Text>
-                      <Text style={styles.mealCount}>
+                    <View style={{ flex: 1, minWidth: 0 }}>
+                      <Text style={styles.mealName} numberOfLines={1}>{m.name}</Text>
+                      <Text style={styles.mealCount} numberOfLines={1}>
                         {m.items.length} {m.items.length === 1 ? 'ingredient' : 'ingredients'}
                       </Text>
                     </View>
                   </View>
 
-                  <View style={styles.cardActions}>
+                  <View style={[styles.cardActions, { flexShrink: 0 }]}>
                     <Pressable
                       style={styles.iconBtn}
                       onPress={() => openEditMeal(m)}
@@ -201,7 +209,7 @@ export const MealsTab: React.FC<MealsTabProps> = ({
                 {/* Items preview */}
                 <View style={styles.itemsList}>
                   {m.items.map((item, idx) => (
-                    <Text key={idx} style={styles.itemLine}>
+                    <Text key={idx} style={styles.itemLine} numberOfLines={1}>
                       • {item.name} <Text style={styles.itemQty}>× {item.quantity}</Text>
                     </Text>
                   ))}
@@ -209,15 +217,15 @@ export const MealsTab: React.FC<MealsTabProps> = ({
 
                 {/* Bottom row with nutrition totals & Log button */}
                 <View style={styles.cardFooter}>
-                  <View style={styles.totalsWrap}>
-                    <Text style={styles.totalProtein}>
+                  <View style={[styles.totalsWrap, { flex: 1, minWidth: 0, marginRight: 8 }]}>
+                    <Text style={styles.totalProtein} numberOfLines={1}>
                       {Math.round(p * 10) / 10}g Protein
                     </Text>
-                    <Text style={styles.totalCalories}>{Math.round(c)} kcal</Text>
+                    <Text style={styles.totalCalories} numberOfLines={1}>{Math.round(c)} kcal</Text>
                   </View>
 
                   <Pressable
-                    style={styles.logNowBtn}
+                    style={[styles.logNowBtn, { flexShrink: 0 }]}
                     onPress={() => {
                       setLogMealTarget(m);
                       setChosenMealType('lunch');
@@ -248,7 +256,10 @@ export const MealsTab: React.FC<MealsTabProps> = ({
                 </Pressable>
               </View>
 
-              <ScrollView contentContainerStyle={styles.formScroll} keyboardShouldPersistTaps="handled">
+              <ScrollView
+                contentContainerStyle={[styles.formScroll, { paddingBottom: 35 + insets.bottom }]}
+                keyboardShouldPersistTaps="handled"
+              >
                 <Text style={styles.inputLabel}>Meal Combo Name</Text>
                 <TextInput
                   value={draftName}
@@ -376,7 +387,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 18,
-    paddingBottom: 78,
   },
   header: {
     flexDirection: 'row',

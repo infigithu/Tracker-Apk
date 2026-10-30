@@ -203,7 +203,12 @@ export const MacroCard: React.FC<MacroCardProps> = ({
       </View>
 
       <View style={styles.macroValues}>
-        <Text style={styles.macroCurrent}>
+        <Text
+          style={styles.macroCurrent}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
+        >
           {Math.round(consumed)}
           <Text style={styles.macroTarget}> / {Math.round(target)}{unit}</Text>
         </Text>
@@ -357,9 +362,11 @@ const styles = StyleSheet.create({
   },
   macroCard: {
     flex: 1,
+    minWidth: 0,
     backgroundColor: Colors.card,
     borderRadius: 16,
-    padding: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 10,
     borderWidth: 1,
     borderColor: '#EFF2EE',
     shadowColor: '#000',
@@ -385,16 +392,16 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   macroValues: {
-    marginBottom: 8,
+    marginBottom: 6,
   },
   macroCurrent: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '800',
     color: Colors.ink,
   },
   macroTarget: {
-    fontSize: 11,
-    fontWeight: '500',
+    fontSize: 10,
+    fontWeight: '600',
     color: Colors.muted,
   },
   macroTrack: {
@@ -410,11 +417,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    justifyContent: 'space-between',
     marginVertical: 10,
   },
   glassItem: {
-    width: '22%',
+    flexBasis: '22%',
+    flexGrow: 1,
+    maxWidth: '24%',
     backgroundColor: '#F8FAFC',
     borderRadius: 12,
     paddingVertical: 10,

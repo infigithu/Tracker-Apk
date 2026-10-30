@@ -8,7 +8,9 @@ import {
   TextInput,
   Alert,
   Modal,
+  useWindowDimensions,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { WaterLog } from '../types';
 import { WaterArcGauge, WaterGlassesGrid } from './SvgGauges';
@@ -31,6 +33,10 @@ export const WaterTrackerTab: React.FC<WaterTrackerTabProps> = ({
   onDeleteWater,
   onUpdateGoal,
 }) => {
+  const insets = useSafeAreaInsets();
+  const { width: windowWidth } = useWindowDimensions();
+  const gaugeSize = Math.min(250, Math.max(190, windowWidth - 90));
+
   const [selectedQuick, setSelectedQuick] = useState<number>(250);
   const [customModal, setCustomModal] = useState(false);
   const [customAmount, setCustomAmount] = useState('250');
@@ -79,16 +85,19 @@ export const WaterTrackerTab: React.FC<WaterTrackerTabProps> = ({
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      contentContainerStyle={[styles.container, { paddingBottom: 95 + Math.max(insets.bottom, 10) }]}
+      showsVerticalScrollIndicator={false}
+    >
       {/* Top Header matching Oasis Reference */}
       <View style={styles.topHeader}>
-        <View>
+        <View style={{ flex: 1, minWidth: 0, marginRight: 8 }}>
           <Text style={styles.brandSubtitle}>OASIS HYDRATION</Text>
-          <Text style={styles.title}>Drink Tracker</Text>
+          <Text style={styles.title} numberOfLines={1}>Drink Tracker</Text>
         </View>
 
         <Pressable
-          style={styles.editGoalBtn}
+          style={[styles.editGoalBtn, { flexShrink: 0 }]}
           onPress={() => {
             setGoalAmount(String(waterGoal));
             setGoalModal(true);
@@ -101,23 +110,42 @@ export const WaterTrackerTab: React.FC<WaterTrackerTabProps> = ({
 
       {/* Large Oasis-style Circular Arc Gauge */}
       <View style={styles.gaugeCard}>
-        <WaterArcGauge consumed={totalWater} goal={waterGoal} size={250} />
+        <WaterArcGauge consumed={totalWater} goal={waterGoal} size={gaugeSize} />
 
         {/* Stats summary row */}
         <View style={styles.statsRow}>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Today</Text>
-            <Text style={styles.statValue}>{totalWater} ml</Text>
+            <Text
+              style={styles.statValue}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+            >
+              {totalWater} ml
+            </Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Daily Goal</Text>
-            <Text style={styles.statValue}>{waterGoal} ml</Text>
+            <Text
+              style={styles.statValue}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+            >
+              {waterGoal} ml
+            </Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Status</Text>
-            <Text style={styles.statValue}>
+            <Text
+              style={styles.statValue}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+            >
               {getHydrationEmoji()} {getHydrationStatus()}
             </Text>
           </View>
@@ -147,7 +175,12 @@ export const WaterTrackerTab: React.FC<WaterTrackerTabProps> = ({
                 style={[styles.quickPill, isSelected && styles.quickPillSelected]}
                 onPress={() => setSelectedQuick(amount)}
               >
-                <Text style={[styles.quickPillAmount, isSelected && styles.quickPillAmountSelected]}>
+                <Text
+                  style={[styles.quickPillAmount, isSelected && styles.quickPillAmountSelected]}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.7}
+                >
                   {amount}
                 </Text>
                 <Text style={[styles.quickPillUnit, isSelected && styles.quickPillUnitSelected]}>
@@ -168,7 +201,7 @@ export const WaterTrackerTab: React.FC<WaterTrackerTabProps> = ({
             }}
           >
             <Ionicons name="create-outline" size={18} color="#0284C7" />
-            <Text style={styles.customAddText}>Custom</Text>
+            <Text style={styles.customAddText} numberOfLines={1}>Custom</Text>
           </Pressable>
 
           <Pressable
@@ -176,7 +209,7 @@ export const WaterTrackerTab: React.FC<WaterTrackerTabProps> = ({
             onPress={() => handleQuickAdd(selectedQuick)}
           >
             <Ionicons name="add" size={22} color="#FFFFFF" />
-            <Text style={styles.mainDrinkText}>+ Log {selectedQuick} ml</Text>
+            <Text style={styles.mainDrinkText} numberOfLines={1}>+ Log {selectedQuick} ml</Text>
           </Pressable>
         </View>
       </View>

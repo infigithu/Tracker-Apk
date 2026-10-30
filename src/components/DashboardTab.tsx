@@ -8,7 +8,9 @@ import {
   Alert,
   Modal,
   TextInput,
+  useWindowDimensions,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LogEntry, Food, Meal, UserSettings, MealType } from '../types';
 import { CalorieRadialGauge, MacroCard } from './SvgGauges';
@@ -62,6 +64,10 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
   onOpenProfile,
   onTriggerCelebrationTest,
 }) => {
+  const insets = useSafeAreaInsets();
+  const { width: windowWidth } = useWindowDimensions();
+  const gaugeSize = Math.min(270, Math.max(210, windowWidth - 72));
+
   const isToday = date === todayKey();
   const [activeSlotForAdd, setActiveSlotForAdd] = useState<MealType | null>(null);
   const [modalSearch, setModalSearch] = useState('');
@@ -144,16 +150,23 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
     : dateObj.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 
   return (
-    <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      contentContainerStyle={[styles.container, { paddingBottom: 95 + Math.max(insets.bottom, 10) }]}
+      showsVerticalScrollIndicator={false}
+    >
       {/* Top Bar matching Page 1 */}
       <View style={styles.topBar}>
         <Pressable style={styles.userProfileBtn} onPress={onOpenProfile}>
           <View style={styles.avatarCircle}>
             <Ionicons name="person" size={18} color="#FFFFFF" />
           </View>
-          <View>
-            <Text style={styles.helloText}>Hello, {targets.userName || 'Champion'}</Text>
-            <Text style={styles.streakSub}>🔥 {targets.streakCount || 1} day streak</Text>
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text style={styles.helloText} numberOfLines={1} ellipsizeMode="tail">
+              Hello, {targets.userName || 'Champion'}
+            </Text>
+            <Text style={styles.streakSub} numberOfLines={1}>
+              🔥 {targets.streakCount || 1} day streak
+            </Text>
           </View>
         </Pressable>
 
@@ -182,7 +195,7 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
           <Ionicons name="chevron-back" size={20} color={Colors.ink} />
         </Pressable>
 
-        <Text style={styles.dateNavText}>
+        <Text style={styles.dateNavText} numberOfLines={1} ellipsizeMode="tail">
           {dateObj.toLocaleDateString(undefined, {
             weekday: 'long',
             month: 'long',
@@ -209,7 +222,7 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
         <CalorieRadialGauge
           consumed={totals.calories}
           target={targets.calorieTarget}
-          size={270}
+          size={gaugeSize}
           mode="calories"
         />
 
@@ -278,13 +291,13 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
             <View key={slot.id} style={styles.slotCard}>
               {/* Slot Header */}
               <View style={styles.slotHeader}>
-                <View style={styles.slotHeaderLeft}>
+                <View style={[styles.slotHeaderLeft, { flex: 1, minWidth: 0, marginRight: 8 }]}>
                   <View style={styles.slotIconWrap}>
                     <Ionicons name={slot.icon} size={18} color={Colors.primaryDark} />
                   </View>
-                  <View>
-                    <Text style={styles.slotTitle}>{slot.title}</Text>
-                    <Text style={styles.slotSub}>
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    <Text style={styles.slotTitle} numberOfLines={1}>{slot.title}</Text>
+                    <Text style={styles.slotSub} numberOfLines={1}>
                       {slotLogs.length > 0
                         ? `${Math.round(slotProtein * 10) / 10}g protein · ${Math.round(slotCalories)} kcal`
                         : `Recommended ${slot.recCalories}`}
@@ -308,11 +321,11 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
                       <View style={styles.itemBullet} />
 
                       <Pressable
-                        style={{ flex: 1 }}
+                        style={{ flex: 1, minWidth: 0 }}
                         onPress={() => openEditQty(item)}
                       >
-                        <Text style={styles.itemName}>{item.name}</Text>
-                        <Text style={styles.itemServing}>
+                        <Text style={styles.itemName} numberOfLines={1}>{item.name}</Text>
+                        <Text style={styles.itemServing} numberOfLines={1}>
                           {item.quantity} × {item.serving} ·{' '}
                           <Text style={styles.itemNutrition}>
                             {Math.round(item.protein * 10) / 10}g protein · {Math.round(item.calories)} kcal
@@ -372,7 +385,10 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
               style={styles.modalSearchInput}
             />
 
-            <ScrollView contentContainerStyle={styles.addModalScroll} keyboardShouldPersistTaps="handled">
+            <ScrollView
+              contentContainerStyle={[styles.addModalScroll, { paddingBottom: 35 + insets.bottom }]}
+              keyboardShouldPersistTaps="handled"
+            >
               {/* Saved Meals quick section */}
               {meals.length > 0 && !modalSearch && (
                 <View style={styles.modalSection}>
